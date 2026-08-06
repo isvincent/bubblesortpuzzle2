@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7157ff">
+  <title>泡沫排序推盤</title>
+  <style>
+    :root{--ink:#27215c;--purple:#7157ff;--deep:#4c38d8;--pink:#ff66ae;--cyan:#46d8e8;--yellow:#ffd65c;--card:#fff;--shadow:0 18px 45px #4a35a52b}
+    *{box-sizing:border-box}button,input{font:inherit}body{margin:0;min-height:100vh;color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:linear-gradient(145deg,#fff7d8 0%,#f1eeff 40%,#dffaff 100%);overflow-x:hidden}
+    .bubble{position:fixed;border-radius:50%;pointer-events:none;opacity:.65;filter:saturate(1.1);animation:float 7s ease-in-out infinite}.b1{width:150px;height:150px;background:#ff8ac3;left:-45px;top:8%}.b2{width:95px;height:95px;background:#7adfeb;right:4%;top:12%;animation-delay:-2s}.b3{width:180px;height:180px;background:#ffd970;right:-65px;bottom:3%;animation-delay:-4s}.b4{width:65px;height:65px;background:#a795ff;left:7%;bottom:10%;animation-delay:-1s}@keyframes float{50%{transform:translateY(-18px) rotate(8deg)}}
+    .app{position:relative;z-index:1;width:min(1180px,100%);margin:auto;padding:28px clamp(16px,4vw,48px) 38px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:14px}.logo{display:grid;place-items:center;width:60px;height:60px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));box-shadow:0 12px 25px #7157ff45;font-size:30px;transform:rotate(-5deg)}h1{font-size:clamp(27px,4vw,42px);margin:0;line-height:1.1;letter-spacing:.04em}.subtitle{font-weight:700;color:#625b91;margin:6px 0 0;font-size:15px}.sound{border:0;background:#fff;color:var(--ink);width:48px;height:48px;border-radius:16px;box-shadow:var(--shadow);cursor:pointer;font-size:21px}.sound:hover{transform:translateY(-2px)}
+    main{display:grid;grid-template-columns:minmax(330px,1.08fr) minmax(300px,.92fr);gap:26px;align-items:start}.panel{background:#ffffffd9;border:2px solid #fff;border-radius:30px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}.game-panel{padding:clamp(18px,3vw,28px)}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.stat{background:#f5f2ff;border-radius:18px;text-align:center;padding:10px 6px}.stat strong{display:block;font-size:clamp(21px,3vw,28px);color:var(--deep)}.stat span{font-size:13px;font-weight:800;color:#746e9e}
+    .progress-line{height:9px;background:#ebe8fa;border-radius:99px;overflow:hidden;margin:0 2px 18px}.progress{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--yellow));border-radius:inherit;transition:width .35s}
+    .board-wrap{position:relative;max-width:570px;margin:auto}.board{aspect-ratio:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:10px;padding:11px;background:linear-gradient(145deg,#4f3bdb,#7963ff);border-radius:26px;box-shadow:inset 0 4px 8px #2e209b55,0 14px 28px #4f3bdb35;touch-action:none}
+    .tile{position:relative;border:0;border-radius:20px;padding:8px 6px;color:var(--ink);background:linear-gradient(145deg,#fff,#f8f6ff);box-shadow:0 7px 0 #dcd5ff,0 10px 15px #2f208a33;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;transition:transform .16s,box-shadow .16s;overflow:hidden;user-select:none}.tile:hover{transform:translateY(-2px);box-shadow:0 9px 0 #dcd5ff,0 13px 18px #2f208a3b}.tile:active{transform:translateY(5px);box-shadow:0 2px 0 #dcd5ff}.tile::after{content:"";position:absolute;width:42px;height:42px;border-radius:50%;background:#fff8;right:-13px;top:-13px}.tile-num{position:absolute;left:8px;top:7px;width:23px;height:23px;border-radius:8px;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:13px;font-weight:900}.tile-icon{font-size:clamp(20px,4.5vw,33px);line-height:1;margin-bottom:5px}.tile-title{font-weight:1000;font-size:clamp(13px,2.1vw,17px);line-height:1.2}.tile-note{font-weight:750;color:#746e9e;font-size:clamp(10px,1.5vw,12px);margin-top:3px;line-height:1.25}.tile.movable{outline:3px solid #ffe275;outline-offset:-4px}.blank{border-radius:20px;background:#3d2dc3aa;box-shadow:inset 0 4px 8px #271a8c70;display:grid;place-items:center}.blank::before{content:"移到這裡";color:#fff9;font-size:12px;font-weight:800}
+    .controls{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;margin-top:17px}.btn{border:0;border-radius:16px;min-height:50px;padding:10px 14px;font-weight:900;cursor:pointer;transition:.2s;box-shadow:0 6px 14px #3d2c8b20}.btn:hover:not(:disabled){transform:translateY(-2px)}.btn:disabled{opacity:.42;cursor:not-allowed}.btn-soft{background:#eeeaff;color:var(--deep)}.btn-primary{background:linear-gradient(135deg,var(--pink),#ff8d71);color:#fff}.hint{text-align:center;margin:13px 0 0;color:#77719d;font-size:13px;font-weight:700}
+    .side{display:grid;gap:18px}.info{padding:24px}.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.section-title h2{font-size:21px;margin:0}.chip{background:#e5fbfd;color:#187f8b;border-radius:99px;padding:6px 10px;font-size:12px;font-weight:900}.goal-list{display:grid;gap:10px}.goal-item{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;background:#f8f7ff;border-radius:15px;padding:10px 12px}.goal-item .n{width:32px;height:32px;display:grid;place-items:center;border-radius:11px;background:var(--c);color:#fff;font-weight:1000}.goal-item strong{font-size:14px}.goal-item small{display:block;color:#77719d;font-weight:700;margin-top:1px}
+    .leader{padding:22px 24px}.leader-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.leader h2{margin:0;font-size:21px}.leaderboard{display:grid;gap:7px}.rank{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;padding:9px 11px;border-radius:13px;background:#f8f7ff;font-weight:800}.rank:first-child{background:#fff5cf}.rank .score{color:var(--deep)}.empty-rank{text-align:center;color:#8580a5;padding:16px;font-weight:700}.clear{border:0;background:transparent;color:#8b85ac;font-size:12px;cursor:pointer;text-decoration:underline}
+    .toast{position:fixed;z-index:9;left:50%;bottom:25px;transform:translate(-50%,20px);padding:12px 18px;border-radius:99px;background:#292252;color:#fff;font-weight:800;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 10px 25px #221a5e50}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .modal{position:fixed;inset:0;z-index:10;display:none;place-items:center;padding:20px;background:#30287299;backdrop-filter:blur(8px)}.modal.show{display:grid}.modal-card{width:min(430px,100%);background:#fff;border-radius:30px;text-align:center;padding:30px;box-shadow:0 30px 70px #1d164477;animation:pop .4s cubic-bezier(.2,1.5,.5,1)}@keyframes pop{from{transform:scale(.72);opacity:0}}.trophy{font-size:65px;display:block;animation:wiggle 1.4s infinite}@keyframes wiggle{50%{transform:rotate(8deg) scale(1.08)}}.modal h2{font-size:30px;margin:7px 0}.modal p{color:#716b97;font-weight:700}.final-score{font-size:38px;font-weight:1000;color:var(--deep);margin:12px}.name-row{display:flex;gap:8px;margin:18px 0}.name-row input{min-width:0;flex:1;border:2px solid #dcd6ff;border-radius:14px;padding:12px 14px;font-size:16px;outline:none}.name-row input:focus{border-color:var(--purple)}.modal-actions{display:flex;gap:10px}.modal-actions .btn{flex:1}
+    .confetti{position:fixed;z-index:11;width:10px;height:18px;top:-25px;border-radius:3px;animation:fall 2.7s linear forwards}@keyframes fall{to{transform:translate(var(--drift),110vh) rotate(800deg)}}
+    @media(max-width:820px){.app{padding-top:18px}header{margin-bottom:16px}main{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}.goal-item{grid-template-columns:30px 1fr;padding:8px}.goal-item .n{width:28px;height:28px}.info,.leader{padding:18px}}
+    @media(max-width:560px){.logo{width:50px;height:50px;border-radius:16px}h1{font-size:27px}.subtitle{font-size:13px}.game-panel{padding:14px;border-radius:24px}.board{gap:7px;padding:8px;border-radius:22px}.tile,.blank{border-radius:15px}.tile-note{display:none}.tile-num{width:20px;height:20px;left:6px;top:6px}.controls{grid-template-columns:1fr 1fr}.controls .btn-primary{grid-column:1/-1;grid-row:1}.side{grid-template-columns:1fr}.hint{font-size:12px}.b1{width:90px;height:90px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <div class="bubble b1"></div><div class="bubble b2"></div><div class="bubble b3"></div><div class="bubble b4"></div>
+  <div class="app">
+    <header><div class="brand"><div class="logo" aria-hidden="true">🫧</div><div><h1>泡沫排序推盤</h1><p class="subtitle">移動步驟卡，把演算法排回正確順序！</p></div></div><button id="soundBtn" class="sound" aria-label="關閉音效" title="切換音效">🔊</button></header>
+    <main>
+      <section class="panel game-panel" aria-label="遊戲區">
+        <div class="stats"><div class="stat"><strong id="moves">0</strong><span>移動步數</span></div><div class="stat"><strong id="timer">00:00</strong><span>挑戰時間</span></div><div class="stat"><strong id="score">10,000</strong><span>目前分數</span></div></div>
+        <div class="progress-line" aria-label="完成進度"><div id="progress" class="progress"></div></div>
+        <div class="board-wrap"><div id="board" class="board" role="grid" aria-label="3 乘 3 泡沫排序推盤"></div></div>
+        <div class="controls"><button id="undoBtn" class="btn btn-soft" disabled>↶ 復原</button><button id="shuffleBtn" class="btn btn-primary">✦ 開始新挑戰</button><button id="hintBtn" class="btn btn-soft">💡 提示</button></div>
+        <p class="hint">點擊空格旁的卡片、滑動卡片，或使用方向鍵操作</p>
+      </section>
+      <aside class="side">
+        <section class="panel info"><div class="section-title"><h2>🧪 排序配方</h2><span class="chip">目標順序</span></div><div id="goalList" class="goal-list"></div></section>
+        <section class="panel leader"><div class="leader-head"><h2>🏆 本機排行榜</h2><button id="clearBtn" class="clear">清除紀錄</button></div><div id="leaderboard" class="leaderboard"></div></section>
+      </aside>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="winModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="winTitle"><div class="modal-card"><span class="trophy">🏆</span><h2 id="winTitle">排序成功！</h2><p>每一顆泡泡都回到正確的位置了。</p><div id="finalScore" class="final-score">0 分</div><div class="name-row"><input id="playerName" maxlength="12" placeholder="輸入你的名字" aria-label="玩家名字"><button id="saveScoreBtn" class="btn btn-primary">登榜</button></div><div class="modal-actions"><button id="closeModalBtn" class="btn btn-soft">看看盤面</button><button id="playAgainBtn" class="btn btn-primary">再玩一次</button></div></div></div>
+  <script>
+    const steps=[
+      {icon:'🔢',title:'準備數列',note:'從第一個元素開始',color:'#7c63ff'},
+      {icon:'🔍',title:'比較相鄰',note:'比較左右兩個值',color:'#39c8d8'},
+      {icon:'🔄',title:'較大交換',note:'大的往右移動',color:'#ff6aaa'},
+      {icon:'➡️',title:'繼續前進',note:'移到下一組元素',color:'#ff9a55'},
+      {icon:'🫧',title:'最大浮頂',note:'本輪最大值就定位',color:'#39b978'},
+      {icon:'↩️',title:'回到起點',note:'縮短未排序範圍',color:'#5a92f4'},
+      {icon:'🔁',title:'重複巡迴',note:'仍有交換就繼續',color:'#c05ee8'},
+      {icon:'✅',title:'排序完成',note:'全部由小到大',color:'#eead22'}
+    ];
+    let state=[1,2,3,4,5,6,7,8,0],history=[],moves=0,seconds=0,timerId=null,started=false,won=false,soundOn=true,touchStart=null;
+    const $=s=>document.querySelector(s),board=$('#board');
+    function renderGoal(){ $('#goalList').innerHTML=steps.map((s,i)=>`<div class="goal-item"><span class="n" style="--c:${s.color}">${i+1}</span><div><strong>${s.icon} ${s.title}</strong><small>${s.note}</small></div></div>`).join(''); }
+    function render(){
+      board.innerHTML='';
+      const blank=state.indexOf(0);
+      state.forEach((v,i)=>{if(!v){const e=document.createElement('div');e.className='blank';e.setAttribute('role','gridcell');board.appendChild(e);return}const s=steps[v-1],b=document.createElement('button');b.className='tile'+(adjacent(i,blank)?' movable':'');b.style.setProperty('--accent',s.color);b.setAttribute('role','gridcell');b.setAttribute('aria-label',`第 ${v} 步，${s.title}`);b.innerHTML=`<span class="tile-num">${v}</span><span class="tile-icon">${s.icon}</span><span class="tile-title">${s.title}</span><span class="tile-note">${s.note}</span>`;b.onclick=()=>move(i);board.appendChild(b)});
+      $('#moves').textContent=moves;$('#timer').textContent=formatTime(seconds);$('#score').textContent=currentScore().toLocaleString();$('#undoBtn').disabled=!history.length||won;
+      const correct=state.reduce((n,v,i)=>n+(v===i+1?1:0),0);$('#progress').style.width=(correct/8*100)+'%';
+    }
+    const adjacent=(a,b)=>Math.abs(a-b)===3||(Math.floor(a/3)===Math.floor(b/3)&&Math.abs(a-b)===1);
+    function move(index,fromUndo=false){const blank=state.indexOf(0);if(!adjacent(index,blank)||won)return;if(!started)startTimer();if(!fromUndo)history.push([...state]);[state[index],state[blank]]=[state[blank],state[index]];moves++;playTone(330+.0+state[blank]*25,.055,'sine');render();if(isSolved())finish();}
+    function startTimer(){started=true;timerId=setInterval(()=>{seconds++;$('#timer').textContent=formatTime(seconds);$('#score').textContent=currentScore().toLocaleString()},1000)}
+    function currentScore(){return Math.max(500,10000-moves*38-seconds*7)}
+    function formatTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+    function isSolved(){return state.every((v,i)=>v===(i+1)%9)}
+    function shuffle(){clearInterval(timerId);state=[1,2,3,4,5,6,7,8,0];let last=-1;for(let n=0;n<140;n++){const blank=state.indexOf(0),options=state.map((_,i)=>i).filter(i=>adjacent(i,blank)&&i!==last),pick=options[Math.floor(Math.random()*options.length)];last=blank;[state[pick],state[blank]]=[state[blank],state[pick]]}if(isSolved())return shuffle();history=[];moves=0;seconds=0;started=false;won=false;$('#shuffleBtn').textContent='✦ 重新洗牌';render();toast('挑戰開始！把 8 張步驟卡排回順序');playTone(520,.12,'triangle')}
+    function undo(){if(!history.length||won)return;state=history.pop();moves=Math.max(0,moves-1);render();playTone(260,.08,'sine');toast('已回到上一步')}
+    function finish(){won=true;clearInterval(timerId);const score=currentScore();render();playWin();confetti();$('#finalScore').textContent=score.toLocaleString()+' 分';setTimeout(()=>{$('#winModal').classList.add('show');$('#playerName').focus()},500)}
+    function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._id);t._id=setTimeout(()=>t.classList.remove('show'),2200)}
+    function hint(){const blank=state.indexOf(0),candidates=state.map((_,i)=>i).filter(i=>adjacent(i,blank));let best=candidates[0],bestVal=-99;candidates.forEach(i=>{const v=state[i],gain=(blank===v-1?2:0)+(i!==v-1?1:0);if(gain>bestVal){bestVal=gain;best=i}});const el=board.children[best];el.animate([{transform:'scale(1)'},{transform:'scale(1.08)',boxShadow:'0 0 0 6px #ffe36e'},{transform:'scale(1)'}],{duration:700,iterations:2});toast('試試看移動發光的卡片')}
+    function playTone(freq,duration,type){if(!soundOn)return;try{const C=window.AudioContext||window.webkitAudioContext,a=new C(),o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.12,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+duration);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+duration);o.onended=()=>a.close()}catch(e){}}
+    function playWin(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.22,'triangle'),i*120))}
+    function confetti(){const colors=['#ff65ad','#ffd65c','#4ed8e8','#765dff','#57c990'];for(let i=0;i<55;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=colors[i%colors.length];c.style.setProperty('--drift',(Math.random()*180-90)+'px');c.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3500)}}
+    function getRanks(){try{return JSON.parse(localStorage.getItem('bubblePuzzleRanks'))||[]}catch(e){return[]}}
+    function renderRanks(){const ranks=getRanks();$('#leaderboard').innerHTML=ranks.length?ranks.map((r,i)=>`<div class="rank"><span>${['🥇','🥈','🥉'][i]||i+1}</span><span>${escapeHtml(r.name)}<small style="display:block;color:#8a84a8">${r.moves} 步 · ${formatTime(r.time)}</small></span><span class="score">${r.score.toLocaleString()}</span></div>`).join(''):'<div class="empty-rank">完成第一場挑戰，就能登上榜首！</div>'}
+    function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+    function saveScore(){const name=$('#playerName').value.trim()||'泡泡高手',ranks=getRanks();ranks.push({name,score:currentScore(),moves,time:seconds});ranks.sort((a,b)=>b.score-a.score);localStorage.setItem('bubblePuzzleRanks',JSON.stringify(ranks.slice(0,5)));renderRanks();$('#winModal').classList.remove('show');toast('成績已登上排行榜！')}
+    board.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchStart={x:t.clientX,y:t.clientY,target:e.target.closest('.tile')}},{passive:true});
+    board.addEventListener('touchend',e=>{if(!touchStart?.target)return;const t=e.changedTouches[0],dx=t.clientX-touchStart.x,dy=t.clientY-touchStart.y;if(Math.hypot(dx,dy)>24){const idx=[...board.children].indexOf(touchStart.target);move(idx)}touchStart=null},{passive:true});
+    document.addEventListener('keydown',e=>{if($('#winModal').classList.contains('show'))return;const blank=state.indexOf(0),map={ArrowUp:blank+3,ArrowDown:blank-3,ArrowLeft:blank+1,ArrowRight:blank-1};if(e.key in map){e.preventDefault();const i=map[e.key];if(i>=0&&i<9&&adjacent(i,blank))move(i)}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo()}});
+    $('#shuffleBtn').onclick=shuffle;$('#undoBtn').onclick=undo;$('#hintBtn').onclick=hint;$('#saveScoreBtn').onclick=saveScore;$('#closeModalBtn').onclick=()=>$('#winModal').classList.remove('show');$('#playAgainBtn').onclick=()=>{$('#winModal').classList.remove('show');shuffle()};
+    $('#soundBtn').onclick=()=>{soundOn=!soundOn;$('#soundBtn').textContent=soundOn?'🔊':'🔇';$('#soundBtn').setAttribute('aria-label',soundOn?'關閉音效':'開啟音效');if(soundOn)playTone(600,.1,'sine')};
+    $('#clearBtn').onclick=()=>{if(confirm('確定要清除本機排行榜嗎？')){localStorage.removeItem('bubblePuzzleRanks');renderRanks();toast('排行榜已清空')}};
+    renderGoal();renderRanks();render();
+  </script>
+</body>
+</html>
